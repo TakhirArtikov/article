@@ -45,14 +45,18 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Page<Article> findAll(Pageable pageable) {
+    public Page<ArticleDTO> findAll(Pageable pageable) {
         Page<Article> entityPage = repository.findAll(pageable);
-        List<Article> entities = entityPage.getContent();
-        return new PageImpl<>(entities, pageable, entityPage.getTotalElements());
+        List<ArticleDTO> dtoList = entityPage
+                .stream()
+                .map(Article::getArticleDto)
+                .toList();
+        return new PageImpl<>(dtoList, pageable, entityPage.getTotalElements());
     }
 
     @Override
-    public List<Article> findAllByCreationDateTimeIsAfter(LocalDateTime creationDateTime) {
-        return repository.findAllByCreationDateTimeIsAfter(creationDateTime);
+    public List<Article> findAllByCreationDateTimeIsAfter() {
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        return repository.findAllByCreationDateTimeIsAfter(sevenDaysAgo);
     }
 }

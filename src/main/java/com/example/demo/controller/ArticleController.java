@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.dto.ArticleDTO;
-import com.example.demo.entity.Article;
 import com.example.demo.service.ArticleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -10,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequestMapping("/api/article")
 @RestController
@@ -60,11 +56,7 @@ public class ArticleController {
     })
     @GetMapping("/paginatedList")
     public Page<ArticleDTO> paginatedList(Pageable pageable) {
-        Page<Article> articlePage = articleService.findAll(pageable);
-        List<ArticleDTO> dtoList = articlePage
-                .stream()
-                .map(Article::getArticleDto).collect(Collectors.toList());
-        return new PageImpl<>(dtoList, pageable, articlePage.getTotalElements());
+        return articleService.findAll(pageable);
     }
     @Operation(summary = "List of Articles in the last 7 days visible only for admin")
     @ApiResponses(value = {
@@ -73,10 +65,9 @@ public class ArticleController {
     })
     @GetMapping("/last7Days")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public Integer findAllCreated7DaysAgo() {
-        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-        List<Article> allByCreationDateTimeIsAfter = articleService.findAllByCreationDateTimeIsAfter(sevenDaysAgo);
-        return allByCreationDateTimeIsAfter.size();
+    public ResponseEntity<Integer> findAllCreated7DaysAgo() {
+
+        return ResponseEntity.ok(articleService.findAllByCreationDateTimeIsAfter().size());
     }
 
 }

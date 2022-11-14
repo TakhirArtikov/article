@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ArticleService {
@@ -15,7 +14,7 @@ public interface ArticleService {
 
     ResponseEntity<List<ArticleDTO>> findAll();
 
-    Page<Article> findAll(Pageable pageable);
+    Page<ArticleDTO> findAll(Pageable pageable);
 
-    List<Article> findAllByCreationDateTimeIsAfter(LocalDateTime creationDateTime);
+    List<Article> findAllByCreationDateTimeIsAfter();
 }
